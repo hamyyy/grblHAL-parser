@@ -5,16 +5,16 @@ export type AxisType = typeof axisTypes[number];
 export type Coordinates = {[key in AxisType]: number}
 
 
-export function parseCoordinates(position: string): Coordinates {
+export function parseCoordinates(position: string, defaultValue = null): Coordinates {
   // example input: "23.3242,102.2234,0.4200"
   let coordinates = position.split(",")
   const obj: Coordinates = {
-    x: 0,
-    y: 0,
-    z: 0,
-    a: 0,
-    b: 0,
-    c: 0,
+    x: defaultValue,
+    y: defaultValue,
+    z: defaultValue,
+    a: defaultValue,
+    b: defaultValue,
+    c: defaultValue,
   };
 
   for (let i = 0; i < coordinates.length; i++) {

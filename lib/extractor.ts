@@ -1,4 +1,4 @@
-import { gcodeMap, errorMap, alarmMap, buildOptionsMap, settingsMap, statusMap, subStateMessage, StatusStateType, statusStateTypes, limitPinMap, controlPinMap, grbl11PinMap } from './constants';
+import { gcodeMap, alarmMap, buildOptionsMap, settingsMap, statusMap, subStateMessage, StatusStateType, statusStateTypes, limitPinMap, controlPinMap, grbl11PinMap, errorMap } from './constants';
 import { parseCoordinates, Coordinates } from "./utils/extractor_utils";
 
 export interface AccessoriesType {
@@ -57,9 +57,7 @@ function parsePins(pins: string) {
       })
     }
   }
-
   else {
-
     let pinData = pins.split("")
 
     pinData.forEach((pin, index) => {
@@ -214,13 +212,15 @@ export const ReportExtractors = {
     let data: {
       code?: number,
       message?: string
+      description?: string
     } = {}
 
     let errorData = error.split(":")
-    let err = errorData[1]
+    let err = errorData[1].trim();
     if (Number.isInteger(parseInt(errorData[1]))) {
-      data.code = parseInt(err)
-      data.message = errorMap[err]
+      data.code = parseInt(err);
+      data.message = errorMap[err]?.message ?? "Unknown error";
+      data.description = errorMap[err]?.description ?? "Unknown error";
     }
     else
       data.message = error.replace("error:", "")
@@ -240,11 +240,13 @@ export const ReportExtractors = {
     let data: {
       code?: number,
       message?: string
+      description?: string
     } = {}
 
     if (Number.isInteger(parseInt(alarmData))) {
       data.code = parseInt(alarmData)
-      data.message = alarmMap[alarmData]
+      data.message = alarmMap[alarmData]?.message ?? "Unknown alarm"
+      data.description = alarmMap[alarmData]?.description ?? "Unknown alarm"
     }
     else
       data.message = alarmData
@@ -332,9 +334,9 @@ export const ReportExtractors = {
 
     data.code = parseFloat(settingData[0].match(/\$(N?\d+)/)[1])
     data.value = parseFloat(settingData[1])
-    data.setting = settingsMap[data.code].setting
-    data.units = settingsMap[data.code].units
-    data.description = settingsMap[data.code].description
+    data.setting = settingsMap[data.code]?.setting ?? "Unknown setting"
+    data.units = settingsMap[data.code]?.units
+    data.description = settingsMap[data.code]?.description ?? "Unknown setting"
 
     return {
       type: 'setting',
@@ -396,14 +398,21 @@ export const ReportExtractors = {
     let systemData = gcodeSystem.replace("[", "").replace("]", "").split(":")
 
     if (systemData[0] == "TLO") {
+
       data = gcodeMap.tool[systemData[0]]
-      data.coordinates = {
-        x: 0,
-        y: 0,
-        z: parseFloat(systemData[1]),
-        a: 0,
-        b: 0,
-        c: 0
+
+      if (systemData.length == 1) {
+        data.coordinates = {
+          x: 0,
+          y: 0,
+          z: parseFloat(systemData[1]),
+          a: 0,
+          b: 0,
+          c: 0
+        }
+      } else {
+        systemData[0].slice(0, 1);
+        data.coordinates = parseCoordinates(systemData.join(","), 0);
       }
     }
     else {
