@@ -77,9 +77,6 @@ export const errorMap = {
   38: "Tool number greater than max supported value.",
 } as const;
 
-export const messageTypes = ["status", "ok", "grblInit", "alarm", "error", "grblSetting", "feedbackMessage", "buildVersion", "buildOptions", "gcodeState", "helpMessage", "gcodeSystem", "probeResult", "echo", "gcodeStartupLine", "unknown"] as const;
-export type MessageType = typeof messageTypes[number];
-
 export const statusStateTypes = ["Idle", "Run", "Hold", "Jog", "Alarm", "Door", "Check", "Home", "Sleep", "Tool"] as const;
 export type StatusStateType = typeof statusStateTypes[number];
 

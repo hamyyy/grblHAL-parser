@@ -1,8 +1,7 @@
 {
-  "name": "grbl-hal-parser",
-  "version": "1.0.0",
+  "name": "grblhal-parser",
+  "version": "1.1.5",
   "description": "grblHAL parser npm package",
-  "main": "index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -12,8 +11,20 @@
     "@types/node": "^14.14.22"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Hamoudy99 <oudy_1999@hotmail.com>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hamoudy99/grblHAL-parser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Hamoudy99/grblHAL-parser/issues"
+  },
+  "homepage": "https://github.com/Hamoudy99/grblHAL-parser#readme",
+  "keywords": [],
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts"
 }

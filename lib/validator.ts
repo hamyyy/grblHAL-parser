@@ -1,5 +1,4 @@
-const Validators = {
-
+export const Validators = {
   status(data: string) {
     // <Hold:0|MPos:0.000,0.000,0.000,0.000,0.000,0.000|Bf:15,128|FS:675.5,24000|Ov:120,100,100|WCO:0.000,-5.200,306.351|A:SFM|Pn:POXYZABCDRHSEBT|A:SMFT>
     return /^<.*>$/.test(data)
@@ -14,7 +13,7 @@ const Validators = {
     //GrblHAL 1.1f ['$' or '$HELP' for help]
     //Grbl 1.1f ['$' for help]
     //Grbl 1.1f [giberish]
-    return /^Grbl(HAL)?\s?(\d\.\d.\s)\[.+\]$/.test(data)
+    return /^Grbl(HAL)?\s?v?(\d+\.\d+.)\s\[.+\]$/.test(data)
   },
 
   alarm(data: string) {
@@ -27,7 +26,7 @@ const Validators = {
 
   grblSetting(data: string) {
     // $xxx=###
-    return /^\$\d+\=.+$/.test(data)
+    return /^\$\d+\=.+$/.test(data) || /^\$N\d+\=(.*)?$/.test(data)
   },
 
   buildVersion(data: string) {
@@ -43,34 +42,31 @@ const Validators = {
   },
 
   firmwareType(data: string) {
-    return /^\[FIRMWARE:.*$\]/.test(data);
+    return /^\[FIRMWARE:.*\]$/.test(data);
   },
 
   driverType(data: string) {
-    return /^\[DRIVER:.*$\]/.test(data);
+    return /^\[DRIVER:.*\]$/.test(data);
   },
 
   driverVersion(data: string) {
-    return /^\[DRIVER VERSION:.*$\]/.test(data);
+    return /^\[DRIVER VERSION:.*\]$/.test(data);
   },
 
   driverOptions(data: string) {
-    return /^\[DRIVER OPTIONS:.*$\]/.test(data);
+    return /^\[DRIVER OPTIONS:.*\]$/.test(data);
   },
 
   boardType(data: string) {
-    return /^\[BOARD:.*$\]/.test(data);
+    return /^\[BOARD:.*\]$/.test(data);
   },
 
   pluginType(data: string) {
-    return /^\[PLUGIN:.*$\]/.test(data);
+    return /^\[PLUGIN:.*\]$/.test(data);
   },
 
-  feedbackMessage(data: string) {
-    if (/^\[((?!G|VER:|TLO|OPT|HLP|echo|PRB).+)\]$/.test(data)) {
-      return !/^\[(VER:)?(\d\.\d\w).+\:.*\]$/.test(data)
-    }
-    return false
+  ipAddress(data: string) {
+    return /^\[IP:.*\]$/.test(data);
   },
 
   gcodeState(data: string) {
@@ -82,14 +78,10 @@ const Validators = {
   },
 
   gcodeSystem(data: string) {
-    return /^\[(G\d+|TLO)\:.*\]$/.test(data)
+    return /^\[(G\d+(\.\d+)?|TLO)\:.*\]$/.test(data)
   },
 
-  gcodeParserState(data: string) {
-    return /^\[GC:.*\]$/.test(data)
-  },
-
-  probeResult(data: string) {
+  probePoint(data: string) {
     return /^\[PRB\:.*\]$/.test(data)
   },
 
@@ -99,21 +91,29 @@ const Validators = {
 
   gcodeStartupLine(data: string) {
     return /^\>?.+\:?ok$/.test(data)
+  },
+
+  message(data: string) { // keep this as last in array
+    return /^\[MSG:.*\]$/.test(data);
+    if (/^\[((?!G|VER:|TLO|OPT|HLP|echo|PRB).+)\]$/.test(data)) {
+      return !/^\[(VER:)?(\d\.\d\w).+\:.*\]$/.test(data)
+    }
+    return false
   }
 } as const;
 
 
-export class Checker {
+export class Validator {
 
-  is<T extends keyof typeof Validators>(type: T | 'all', data: string): boolean | { [key in T]?: boolean } {
+  is<T extends keyof typeof Validators>(type: T, data: string): boolean {  //| { [key in T]?: boolean } {
 
-    if (type == 'all') {
-      const results: { [key in T]?: boolean } = {};
-      for (let key in Validators) {
-        results[key](Validators[key](data));
-      }
-      return results;
-    }
+    // if (type == 'all') {
+    //   const results: { [key in T]?: boolean } = {};
+    //   for (let key in Validators) {
+    //     results[key](Validators[key](data));
+    //   }
+    //   return results;
+    // }
 
     return Validators[type](data) as any;
   }
